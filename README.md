@@ -15,9 +15,7 @@ Python 3, tensorflow >= 1.12.0, matplotlib, scipy, sklearn
 - ```python step1.py``` Runs the model for a short episode in each video (frames 1 to XXX) to train its semantic memory. It creates the file ```semantic_memory.pkl```.
 - ```python step2.py python timestorm_dataset```  Generates the timeseries of surprises for each trial. The output files go to the folder ```/trials_surpr```.
 - ```python step3_save_av_children.py``` Runs all trials to save the number of average children stored in episodic memory. It creates the file ```all_av_children.pkl```.
-- Step 4:
- - ```python step4.2_accumulators_fig_different_att_only_used_trials.py``` Produces a Block-like figure purely based on the accumulators. It uses different attention levels for prospective and retrospective and different effort for high and low cognitive load.
- - ```python step4.3_save_accumulators_dataset.py``` Produces a Block-like figure purely based on the accumulators. It uses different attention levels for prospective and retrospective!
+ - ```python step4_accumulators_fig_different_att_only_used_trials.py``` Produces a Block-like figure purely based on the accumulators. It uses different attention levels for prospective and retrospective and different effort for high and low cognitive load.
  - ```python step5_linear.py``` Uses the file produced in step 4 to produce the final figures with model reports using linearSVR.
 
 
