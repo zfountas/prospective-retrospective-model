@@ -23,7 +23,6 @@ __maintainer__ = "Zafeirios Fountas"
 __email__ = "fountas@outlook.com"
 __status__ = "Published"
 
-from __future__ import print_function
 import numpy as np
 import pickle
 import os
