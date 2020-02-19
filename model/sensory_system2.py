@@ -279,66 +279,7 @@ class AlexNet:
     # Keep save_raw_mask false if no logging is required and we need to optimize
     # speed/memory consumption..
     def update(self, frame, save_raw_mask=False):
-        #Read Image, and change to BGR
-        #frame = frame - mean(frame)
-        #frame[:, :, 0], frame[:, :, 2] = frame[:, :, 2], frame[:, :, 0]
-
         start_time = time.time()
-
-        # TODO: tf.train with your optimizer and you give the loss
-        #my_loss = self.sess.run(self.optimize, feed_dict = {self.in_:[frame],self.christos:[self.generative_model_prediction]})
-        # run everything at once as a list: self.sess.run([self.optimize, self.input_grads, ]
-
-        if self.spatial_attention and self.generative_model_prediction != np.array([]):
-            self.gradients, self.activations = self.sess.run([self.input_grads, self.out], feed_dict = {self.in_ : [frame], self.christos : [self.generative_model_prediction]})
-
-            #print('WTF1', np.shape(self.gradients)) # (1, 1, 227, 227, 3) in the first layer
-
-            # Get rid of the first dimensions that involve batch size etc...
-            while len(np.shape(self.gradients)) > 1 and np.shape(self.gradients)[0] == 1:
-                self.gradients = self.gradients[0]
-
-
-            # This is only added for the space paper so we get the raw activations.
-            if save_raw_mask:
-                self.raw_mask = np.copy(np.array(self.gradients))
-                #self.raw_mask_values = [self.raw_mask[gaze_positions[0], gaze_positions[1]],
-                #                        self.raw_mask[gaze_positions[2], gaze_positions[3]]]
-
-            # --------- PRE-PROCESSING OF THE MASK ---------
-            self.gradients = np.abs(np.array(self.gradients))
-            #print("GRad:",np.shape(self.gradients))
-            #print("GRADIENTS:", self.gradients)
-            #print(self.gradients.min(),self.gradients.max(),self.gradients.mean(),np.shape(self.gradients))
-
-            # Transform gradients to the log space to give emphasis to low error areas compared to small spikes
-            # In theory this step is not necessary
-            #self.gradients = np.tanh(self.gradients)
-
-            # SOS NOTE: TRICK: If 3 dimensional, average over 3rd dimension (colour/context) so attention is defined only over space (x and y).
-            if len(np.shape(self.gradients)) == 3:
-                self.gradients[:] = self.gradients.mean(axis=-1,keepdims=1)
-
-            initial_gradients = np.copy(self.gradients)
-            # Normalize gradients ...
-            """
-            for tt in range(5):
-                self.gradients = np.interp(initial_gradients, (initial_gradients.min(), initial_gradients.max()), (0, self.grad_corrector))
-                self.gradients[self.gradients > 1.0] = 1.0
-                self.grad_error = 1.0*(0.5 - self.gradients.mean())
-                self.grad_corrector += self.grad_error
-            """
-            for tt in range(5):
-                self.gradients = self.mask_baseline + (1.0-self.mask_baseline)*np.tanh(initial_gradients/self.grad_corrector)
-                self.gradients = np.interp(self.gradients, (self.gradients.min(), self.gradients.max()), (self.mask_baseline, 1.0))
-
-                self.grad_error = self.change_rate*(self.gradients.mean() - self.mask_average)
-                self.grad_corrector += self.grad_error
-                if self.grad_corrector <= 0.0:
-                    self.grad_corrector = 0.00000001
-
-        else:
-            self.activations = self.sess.run(self.out, feed_dict = {self.in_ : [frame]})
 
         # NOTE: output.shape[0] will be 1 because we provide only one image!
         if self.end_of_network:
@@ -350,17 +291,6 @@ class AlexNet:
                 self.best_label_prob = self.best_label_prob[1:]
 
         self.time_took = time.time() - start_time
-
-        #print(" ------- Output ------- ")
-        #for input_im_ind in range(self.activations.shape[0]):
-        #    inds = argsort(self.activations)[input_im_ind,:]
-        #    print("Image", input_im_ind, class_names[inds[-1]])
-        #    # Print 5 most active neurons (labels)
-        #    for i in range(5):
-        #        print(class_names[inds[-1-i]], self.activations[input_im_ind, inds[-1-i]])
-
-        # Output normally should be all activations
-        #return [c1, c2, c3, c4, c5, fc6, fc7, self.activations], best_label, time_took
 
 
 def __main__():

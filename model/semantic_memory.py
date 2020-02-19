@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-This class creates instances of a semantic memory.
+
+""" This class creates instances of a semantic memory.
+
 It maintains a list of labels and corresponding mean activation patterns (M),
 variance of activation patterns (Mvar) anda list (actually python dictionary)
 of conditional probabilities (P) for each prior and set of conditions that we've
@@ -20,9 +22,25 @@ Mvar[2][0] = 0.1
 # Example of P
 P[(2,0,2,0)] = 0.2 # P(M^2_0|M^2_2,M^3_0)
 
-TODO: UPDATE THE DESCRIPTION...
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import print_function
+
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
+
 import numpy as np
 import pickle
 import json
@@ -31,7 +49,6 @@ import os.path
 from alexnet.classes import class_names
 
 class SemanticMemory:
-
 
     # Class of prior objects with Gaussian strucutre and short term plasticity
     class Prior:
@@ -353,7 +370,7 @@ class SemanticMemory:
             return None
 
     """
-    NOTE: Here we also update our surprise for this timestep!!
+    NOTE: Here we also update our surprise for this timestep!
           It's important to happen here because here is the first time that
           the semantic memory has access to the current atn (through the error)!
     """
@@ -370,11 +387,6 @@ class SemanticMemory:
         self.last_similarity_with_an[n] = self.RBF_from_dist(np.linalg.norm(error_vector),
                                                 self.M[n][self.last_prior_index[n]].var, n)
 
-        # Suprise: 1-P[z|z old e old..]
-        #self.last_surprise[n] = 1.0 - self.last_similarity_with_an[n] - self.WW[n])*(1.0-self.last_Pcon[n]
-        #if False: # As it was with ww = 0
-        #    self.last_surprise[n] = 1.0-self.last_Pcon[n]*self.last_similarity_with_an[n]
-        #else:
         self.last_surprise[n] = 1.0
         for i in range(len(self.last_Pcon_all[n])):
             #print('aaaaa', np.shape(x_tn), np.shape(self.M[n][self.all_priors_indx[n]].mean))
@@ -398,7 +410,7 @@ class SemanticMemory:
         # error here comes from activations[n]-M[n][k] (in KF it's Zt-Xt)
         #R = 0.9**2
 
-        # Nice explanation: https://github.com/akshaychawla/1D-Kalman-Filter
+        # Good explanation: https://github.com/akshaychawla/1D-Kalman-Filter
 
         # NOTE: Kalman Gain does not depend on the state of the system or on the
         # measurements. It depends only from A, H, P0, R, Q, which are all fixed.
@@ -445,7 +457,6 @@ class SemanticMemory:
         # Calculate Kalman gain
         self.K[n] = a_priori_state_cov/(a_priori_state_cov + self.R**2)
 
-        # SOS: This is how it is described in some neuroscience papers
         #mean_long = (1.0 - K[n]) * a_priori_state_m + K[n] * (mean - mean_long)
         self.M[n][index].mean_long = a_priori_state_m + self.K[n] * (self.M[n][index].mean - self.M[n][index].mean_long)
         self.M[n][index].var = (1.0 - self.K[n]) * a_priori_state_cov
@@ -467,17 +478,6 @@ class SemanticMemory:
             # retrieve probability (counter)
             noise = np.random.rand()*self.Pcont_noise
             if conditions in self.M[n][prior_index].P:
-                # https://www.desmos.com/calculator/hvzzrlm3qy
-                """
-                p_contx = self.M[n][prior_index].P[conditions]
-                if p_contx == 1:
-                    all_counters_of_conditions.append(1.0 + noise)
-                elif p_contx > 1:
-                    all_counters_of_conditions.append(1.0 + np.log(p_contx) + noise)
-                else:
-                    print("ERROR: What kind of value is this?? Exiting..")
-                    exit()
-                """
                 all_counters_of_conditions.append(np.log(self.M[n][prior_index].P[conditions]) + noise)
             else:
                 all_counters_of_conditions.append(noise)     # NOTE: This is just noise!! If counter only 1 in other cases this will be important!
@@ -487,8 +487,9 @@ class SemanticMemory:
         self.last_Pcon_all[n] = self.softmax(all_counters_of_conditions)
 
         # Find the index in memory that gives us the highest probability!
-        # SOS NOTE: This is the index of the current list, it DOES NOT correspond
-        # to the index (key/label) of the prior. This would be self.all_priors_indx[n][indx]
+        # NOTE: This is the index of the current list, it DOES NOT correspond
+        # to the index (key/label) of the prior.
+        # This would be self.all_priors_indx[n][indx]
         indx = np.argmax(self.last_Pcon_all[n])
 
         # Save this for illustration purposes
@@ -498,8 +499,6 @@ class SemanticMemory:
             print("----------------------------LAYER:", n, "------------------")
             print("Current conditions:", conditions)
             print("ALL PROB CONTEXT:",len(all_counters_of_conditions),[x1 for x1 in all_counters_of_conditions if x1 > 0.0])
-            #print("P(index,cont,dis):",[ (i1,round(x1,2),round(y1,2)) for i1,x1,y1 in zip(range(len(all_Pcon)),all_Pcon,all_Pdis) if x1 > 0.0 or y1 > 0.0 ])
-            #print("Chose:",(self.all_priors_indx[n][indx], all_Pdis[indx], all_Pcon[indx]),"which makes:",all_terms[indx])
             print("Previously chosen k:", self.last_prior_index[n])
             print("Keys of priors in L0:", self.M[n].keys())
 
@@ -546,24 +545,6 @@ class SemanticMemory:
             plt.xticks(xs)
             plt.yticks(ys)
             plt.ylabel('P_context')
-
-            """
-            plt.subplot(3,2,4)
-            xs = range(len(all_Pdis))
-            ys = all_Pdis
-            plt.bar(xs, ys)#, 1.0, align='center')
-            plt.xticks(xs)
-            plt.yticks(ys)
-            plt.ylabel('P_distance')
-
-            plt.subplot(3,2,6)
-            xs = range(len(all_terms))
-            ys = all_terms
-            plt.bar(xs, ys)#, 1.0, align='center')
-            plt.xticks(xs)
-            plt.yticks(ys)
-            plt.ylabel('The combination (surprise)')
-            """
 
             #plt.tight_layout()
             plt.savefig('single_instance_debugging_fig.png')
@@ -717,28 +698,3 @@ class SemanticMemory:
         else:
             print("ERORR: No prior found:",actual_prob, -1, -1)
             exit()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#

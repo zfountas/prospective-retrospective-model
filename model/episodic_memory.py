@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+Episodic memory structure that relies on the same labels (components) defined by semantic memory.
 
-tree structure stuff for particular experiences..
-
-TODO: UPDATE THE DESCRIPTION...
 """
 from __future__ import print_function
 import numpy as np
@@ -29,7 +27,7 @@ class EpisodicMemory:
             self.previous = None
 
         def __repr__(self):
-            return str(round(self.novelty*self.recency,1))#"N"#"Node: [%s]" % str(np.shape(self.activation))
+            return str(round(self.novelty*self.recency,1))
 
     def __init__(self, parameters_filename):
         params = json.load(open(parameters_filename))
@@ -211,8 +209,8 @@ class EpisodicMemory:
     #   3. Novelty/surprise: How important this memory was!
     def check_for_recall_root(self, layer, current_prior_index, prior_mean, prior_var):
         # NOTE: This has the same effect with multiplying the recall_frequency
-        #       with the final probability! Thing about it ;)
-        #       We have to use it because otherwise we'd recall stuff all the time
+        #       with the final probability!
+        #       Needs to be used as otherwise the system would recall experiences all the time
         rr = np.random.rand()
         if rr >= self.recall_frequency:
             return -1
@@ -236,13 +234,10 @@ class EpisodicMemory:
 
         # Select one of the filtered nodes randomly based on the distribution Precall[node]
         rand_num = np.random.rand()*float(sum(possible_nodes_probs))
-        #print("rand_num",float(sum(possible_nodes_probs)), rand_num, "curr_prior_indx", current_prior_index, [node.prior_index for node in self.all_nodes[layer]])
         selected_index = 0
         A = [sum(possible_nodes_probs[:i]) for i in range(1,len(possible_nodes_probs)+1)]
-        #print("A",A)
         while selected_index < len(A) and rand_num > A[selected_index]:
             selected_index += 1
-            #print("sel_index",selected_index)
         if selected_index >= len(A):
             print("Something went wrong:", A, selected_index)
             exit()
@@ -283,7 +278,6 @@ class EpisodicMemory:
             current_layer = root_layer
             current_index = root_index
             while current_layer > 0 and self.all_nodes[current_layer][current_index].children:
-                #print("Cur layer:", current_layer, "Cur index:", current_index, "number of children:", len(self.all_nodes[current_layer][current_index].children))
                 current_index = self.all_nodes[current_layer][current_index].children[0]
                 current_layer -= 1
                 first_frame[current_layer] = current_index
@@ -292,7 +286,6 @@ class EpisodicMemory:
             current_index = root_index
             while current_layer > 0 and self.all_nodes[current_layer][current_index].children:
                 current_children = self.all_nodes[current_layer][current_index].children
-                #print(current_layer, "CHILDREN",current_children, "current_index",current_index)
                 max_P = 0.0
                 current_index = 0
                 current_layer -= 1
@@ -341,9 +334,7 @@ class EpisodicMemory:
                         else:
                             self.step3_tree[current_layer][parent_index][1].remove(child)
                             current_nodes[current_layer][parent].remove(child)
-                            #print("En eperasen")
                     else:
-                        #print("Etsi ena debugging na yparxei",child,first_frame[current_layer-1])
                         self.step3_tree[current_layer][parent_index][1].remove(child)
                         current_nodes[current_layer][parent].remove(child)
             current_layer -= 1

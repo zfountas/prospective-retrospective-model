@@ -1,3 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" This file contains the logic of the perception loop of the system and
+connects together semantic and episodic memories.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
+
 from __future__ import print_function
 import numpy as np
 import pickle
@@ -44,11 +69,6 @@ class PredictiveCodingSystem:
         # 6. return error
         # ----------------------------------------------------------------------
 
-        ## NOTE: Should we start from the bottom? I think we should at least
-        # start some part from the bottom because otherwise we'll never see the
-        # actual input! Update: We do loop from the bottom but it's fine if you
-        # think about it.. :)
-
         ## 1. UPDATE SENSORY INPUT
         # ... this is done outside this method (in pseudocodix) for now ...
 
@@ -64,7 +84,7 @@ class PredictiveCodingSystem:
         # prediction
 
         # If there is a node that we are currently in the process of recalling,
-        # don't run the generative model! TODO: See if this should be like that!
+        # don't run the generative model!
         if self.timing:
             time_before1 = time.time()
         e1n_index = episodic_memory.get_last_in_layer(layer).prior_index
@@ -109,7 +129,7 @@ class PredictiveCodingSystem:
             # Here we check whether the episodic memory system will start a
             # new recall of an episode
             prior_index_1 = semantic_memory.last_prior_index[layer]
-            last_mean = semantic_memory.M[layer][prior_index_1].mean            #STAR: last_mean = atn
+            last_mean = semantic_memory.M[layer][prior_index_1].mean
             last_var = semantic_memory.M[layer][prior_index_1].var
             # NOTE: We need this second term here as there is no info in episodic
             # memory (or here) about the actual neuron size of a layer!!
@@ -173,7 +193,6 @@ class PredictiveCodingSystem:
             time3 = time_before4 - time_before3
 
         # 5. UPDATE SEMANTIC MEMORY
-        # TODO: Think if here we should add new priors instead of when threshold is passed!
         # episodic memory is passed to update indices when priors merge
         semantic_memory.update_priors(atn, layer, attention_mask)
         if self.timing:
@@ -186,7 +205,7 @@ class PredictiveCodingSystem:
             time5 = time_before6 - time_before5
         if self.timing: print("Layer:", layer, "This is how long it takes:", time1, time2, time3, time4, time5)
 
-        # WE HAVE UPDATED THE ERROR AND ...
+        # The error has been updated here..
         if self.fw_for_pred:
             semantic_memory.last_atn[layer] = np.copy(atn)
         return did_merge

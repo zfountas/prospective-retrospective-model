@@ -1,17 +1,36 @@
-"""
-Script to run all trials and produce the figure based on just the accummulators
-(no regression).
-It also saves a pickle with the resulting dataset called 'model_accumulators_dataset.pkl'
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" Script to run all trials and produce the figure based on just the
+accummulators (no regression). It also saves a pickle with the resulting dataset
+called  'model_accumulators_dataset.pkl'
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Arguments
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
+
 import pickle, csv
 import matplotlib.pyplot as plt
 from scipy import stats
 from model.attention_system import *
-from model.episodic_memory import * # tree structure stuff of the particular experience
-from model.working_memory import *  # accummulators etc
-from model.semantic_memory import * # bag of words with trees etc
+from model.episodic_memory import *
+from model.working_memory import *
+from model.semantic_memory import *
 import trials_used as tu
 
 # Generate a sub-tree probabilistically and return it
@@ -39,7 +58,6 @@ def recall(ep_mem_sigma, ep_mem_av_children, all_nodes, effort=1, verbose=False,
     current_layer = root_layer
     current_index = 0
     while current_layer > 0 and all_nodes[current_layer][current_index].children:
-        #print("Cur layer:", current_layer, "Cur index:", current_index, "number of children:", len(all_nodes[current_layer][current_index].children))
         current_index = all_nodes[current_layer][current_index].children[0]
         current_layer -= 1
         first_frame[current_layer] = current_index
@@ -77,7 +95,6 @@ def recall(ep_mem_sigma, ep_mem_av_children, all_nodes, effort=1, verbose=False,
                         current_nodes[current_layer][parent].remove(child)
                         #print("En eperasen")
                 else:
-                    #print("Etsi ena debugging na yparxei",child,first_frame[current_layer-1])
                     step3_tree[current_layer][parent_index][1].remove(child)
                     current_nodes[current_layer][parent].remove(child)
         current_layer -= 1
@@ -188,14 +205,10 @@ retro_acc = {'low':[], 'high':[]}
 prosp_acc_per_s = {'low':[], 'high':[]}
 retro_acc_per_s = {'low':[], 'high':[]}
 
-# SOS: For some reason, sigmas<0.5 are acting very differntly
-# sigma: higher sigma shifts the retrospective curve upwards
-# effort: higher effort shifts the retrospective curve upwards
-# higher tau (less decay, i.e. less attention) shifts both curves downwards
 params = {'low_pr_t': 46, 'high_pr_t': 52, 'low_ret_t': 90, 'high_ret_t': 90.0, 'low_eff': 1, 'high_eff': 70, 'recency': 0.1, 'sigma': 0.1}
 
 TRIAL_FIRST = 1
-TRIAL_LAST = 4290 # 4290 are all of them sparsegps in gpflow....
+TRIAL_LAST = 4290
 
 all_indices = list(range(TRIAL_FIRST, TRIAL_LAST))
 
@@ -313,7 +326,6 @@ for i in range(layers):
     #ax1.get_xaxis().tick_bottom()
     #ax1.axes.get_yaxis().set_visible(False)
 
-
     plt.plot([1.10, 1.10],[np.mean(retro_acc_per_s['low'][i])-stats.sem(retro_acc_per_s['low'][i]), np.mean(retro_acc_per_s['low'][i])+stats.sem(retro_acc_per_s['low'][i])],c='k',lw=1.0)
     plt.plot([2.10, 2.10],[np.mean(retro_acc_per_s['high'][i])-stats.sem(retro_acc_per_s['high'][i]), np.mean(retro_acc_per_s['high'][i])+stats.sem(retro_acc_per_s['high'][i])],c='k',lw=1.0)
     plt.plot([1.10,2.10], [np.mean(retro_acc_per_s['low'][i]), np.mean(retro_acc_per_s['high'][i])],'k--',label='Retrospective')
@@ -324,18 +336,8 @@ for i in range(layers):
     plt.plot([1,2], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],'k',label='Prospective')
     plt.scatter([1,2], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],c='k')
 
-    #plt.legend()
-    #plt.xlabel('Layer: '+str(i))
-    #plt.ylabel("Mean duration judgment ratio"+str(params))
-    #plt.xlabel("Cog. load ("+str(len(retro_acc_per_s['low'][i]))+" vs "+str(len(retro_acc_per_s['high'][i]))+" & "+str(len(prosp_acc_per_s['low'][i]))+" vs "+str(len(prosp_acc_per_s['high'][i]))+") non-c.")
-    #plt.ylim(0.9,1.4)
-
     plt.xlim(0.5,2.5)
-    #plt.xticks([1,2],['Low', 'High'])
     plt.xticks([],[])
-    #plt.yticks([1.5,2.0],[1.5, 2])
-    #plt.axis('off')
-
 
     ax2 = plt.subplot(4,layers,layers+1+i)
     ax2.set_frame_on(False)
@@ -351,12 +353,11 @@ for i in range(layers):
     plt.xlabel('Layer: '+str(i))
 
     plt.xlim(0.5,2.5)
-    #plt.ylim(0.5,3.5)
     plt.xticks([],[])
     if i == 0:
         pass
     else:
-        pass #plt.yticks([],[])
+        pass
 
 
 plt.subplot(212)
@@ -369,12 +370,9 @@ for i in range(layers):
     plt.plot([2+2*i, 2+2*i],[np.mean(prosp_acc_per_s['high'][i])-stats.sem(prosp_acc_per_s['high'][i]), np.mean(prosp_acc_per_s['high'][i])+stats.sem(prosp_acc_per_s['high'][i])],c='k',lw=1.0)
     plt.plot([1+2*i,2+2*i], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],'k',label='Prospective')
     plt.scatter([1+2*i,2+2*i], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],c='k')
-#plt.xlabel('Layer: '+str(i))
 
 plt.xlim(0.5,layers*2+0.5)
-#plt.ylim(1.1,3.3)
 plt.xticks([],[])
-#plt.yticks([],[])
 
 
 plt.tight_layout()
@@ -391,26 +389,15 @@ for i in range(layers):
     plt.plot([2+2*i, 2+2*i],[np.mean(prosp_acc_per_s['high'][i])-stats.sem(prosp_acc_per_s['high'][i]), np.mean(prosp_acc_per_s['high'][i])+stats.sem(prosp_acc_per_s['high'][i])],c='k',lw=1.0)
     plt.plot([1+2*i,2+2*i], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],'k',label='Prospective')
     plt.scatter([1+2*i,2+2*i], [np.mean(prosp_acc_per_s['low'][i]), np.mean(prosp_acc_per_s['high'][i])],c='k')
-#plt.xlabel('Layer: '+str(i))
 
 plt.xlim(0.5,layers*2+0.5)
-#plt.ylim(1.1,3.3)
 plt.xticks([],[])
 plt.yscale('log')
-#plt.yticks([],[])
 
 plt.tight_layout()
 plt.savefig('figures/step4_AccsBlock_diff_att_fig2.png')
 plt.savefig('figures/step4_AccsBlock_diff_att_fig2.svg')
 
-
 plt.show()
 
-
 print('OK')
-
-
-
-
-
-#

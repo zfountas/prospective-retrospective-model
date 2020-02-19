@@ -1,3 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" This script uses the file produced in step 4 to produce the final figures
+with model reports using linearSVR.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pickle,csv
@@ -48,10 +73,6 @@ TRIALS = {'prosp_low' :np.array(data['trial_no']['prosp_low']).transpose(),
           'retro_low' :np.array(data['trial_no']['retro_low']).transpose(),
           'retro_high':np.array(data['trial_no']['retro_high']).transpose()}
 
-#alg = SVR(kernel='rbf', C=150, gamma=0.01) #0.001 normally 0.0001 but this is better!
-#alg = SVR(kernel='poly', C=150, degree=2, gamma=0.01) #0.001 normally 0.0001 but this is better!
-#alg = SVR(kernel='linear') #0.001 normally 0.0001 but this is better!
-
 Xtrain = {'city':[], 'office_cafe':[], 'campus_outside':[]}
 Ytrain = {'city':[], 'office_cafe':[], 'campus_outside':[]}
 minimum_length = min([len(YY[x]) for x in ['prosp_low', 'prosp_high']])
@@ -61,7 +82,7 @@ for i,mode in enumerate(['prosp_low', 'prosp_high']):
         scene_type = scene_type_per_trial[trial]
         Xtrain[scene_type].append(XX[mode][i])
         Ytrain[scene_type].append(YY[mode][i])
-# TODO: check here if used in human experiments..
+
 xx = np.array([1.0,1.5,2.0,3.0, 4.0, 6.0, 8.0, 12.0, 16.0, 24.0, 32.0, 48.0, 64.0])
 
 while True:
@@ -96,16 +117,8 @@ while True:
                 y_overall[mode].append(Yest[y])
                 e_overall[mode].append((Yest[y]-Y[y])/Y[y])
 
-    # Now x,y,e_overall have the results for all scene_types! - So scene don't need to be used from now on..
-    """
-    r1 = np.mean(e_overall['retro_low'])
-    r2 = np.mean(e_overall['retro_high'])
-    p1 = np.mean(e_overall['prosp_low'])
-    p2 = np.mean(e_overall['prosp_high'])
-    if r1 > r2 or p1 < p2:
-        print('SEED',SEED,'IS BAD!')
-        continue
-    """
+    # Now x,y,e_overall have the results for all scene_types!
+    # So scene doesn't need to be used from now on..
     plt.figure(figsize=(16,6))
     for m,mode in enumerate(['prosp_low', 'prosp_high', 'retro_low', 'retro_high']):
         Y_binned = {}

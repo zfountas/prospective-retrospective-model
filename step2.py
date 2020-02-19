@@ -1,12 +1,32 @@
-""" -------------------------------- STEP 2 --------------------------------
-    The model runs for a short episode in each video (frames 1 to XXX) to train
-    its semantic memory.
-    OUTCOME:
-        ...
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-    RUN:
-    python step2.py python timestorm_dataset
+""" Script to generate the timeseries of surprises for each trial.
+
+The model runs for a short episode in each video (frames 1 to XXX) to train its
+semantic memory.
+Runs with: python step2.py python timestorm_dataset
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
+
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
+
+
 import os, csv
 from subprocess import call
 from sys import argv
@@ -21,7 +41,7 @@ FIRST = int(argv[3])
 LAST = int(argv[4])
 
 python_execution_command = argv[1] # 'py', 'python' or 'python3'...
-dataset_path = argv[2]+'/' # G:\timestorm_dataset
+dataset_path = argv[2]+'/'
 for i in range(1,34):
     filename = dataset_path+'video_'+str(i)+'.mp4'
     if not os.path.exists(filename): exit('Error: File '+filename+' does not exist!!')
@@ -45,7 +65,7 @@ with open(filename_vts, mode='r') as ff:
 print([k+' -> '+str(len(VTS[k])) for k in VTS.keys()])
 print('')
 
-for i in range(FIRST, LAST): #(len(VTS['End_frame'])):
+for i in range(FIRST, LAST):
     print([k+' -> '+str(VTS[k][i]) for k in VTS.keys()])
     filename = dataset_path+'video_'+str(VTS['Video'][i])+'.mp4'
     first_frame = VTS['Start_frame'][i]

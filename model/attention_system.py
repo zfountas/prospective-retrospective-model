@@ -1,13 +1,27 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-TODO: Update description
 
-Created on Fri Mar 17 17:59:19 2017
+""" This file provides an attention mechanism, implemented as a stochastic
+threshold, that is able to detect salient events in a given timeseries.
 
-This file reads a timeseries of distances between snapshots of alexnet activation
-(one timeseries for each layer for each trial) and calculates accumulators for
-each layer.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
 """
+
+__authors__ = ["Zafeirios Fountas", "Kyriacos Nikiforou", "Anastasia Sylaidi"]
+__credits__ = ["Warrick Roseboom", "Anil Seth",  "Murray Shanahan"]
+__license__ = "GPLv3"
+__version__ = "0.1"
+__maintainer__ = "Zafeirios Fountas"
+__email__ = "fountas@outlook.com"
+__status__ = "Published"
 
 import numpy as np
 import json
@@ -16,7 +30,6 @@ class AttentionSystem:
 
     def __init__(self, parameter_file):
         self.reset(parameter_file)
-
 
     def reset(self, parameter_file):
         # Load attention parameters
@@ -37,8 +50,6 @@ class AttentionSystem:
             self.last_t.append(0.0)
             self.thresholds.append(0.0)
             self.time.append(0.0)
-
-
 
     # Use the attention mechanism to calculate thresholds
     # NOTE: This method does not reset threshold
@@ -61,8 +72,7 @@ class AttentionSystem:
 
         self.time[L] += 1.0
 
-
-# For unit tests!
+# For unit tests
 if __name__ == "__main__":
     ac = attention_system()
     distances = []
