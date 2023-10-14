@@ -2,7 +2,7 @@
 
 This source code release accompanies the manuscript:
 
-Z. Fountas, A. Sylaidi, K. Nikiforou, A. Seth, M. Shanahan, W. Roseboom, "[A predictive processing model of episodic memory and time perception](https://direct.mit.edu/neco/article-abstract/34/7/1501/111336/A-Predictive-Processing-Model-of-Episodic-Memory)" Neural Computation 34.7 (2022): 1501-1544,
+> Z. Fountas, A. Sylaidi, K. Nikiforou, A. Seth, M. Shanahan, W. Roseboom, "[A predictive processing model of episodic memory and time perception](https://direct.mit.edu/neco/article-abstract/34/7/1501/111336/A-Predictive-Processing-Model-of-Episodic-Memory)" Neural Computation 34.7 (2022): 1501-1544,
 
 which can also be found in a [pre-print](https://www.biorxiv.org/content/10.1101/2020.02.17.953133v1 "In bioRxiv") version.
 
