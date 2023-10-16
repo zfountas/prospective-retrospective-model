@@ -292,11 +292,9 @@ while success:
     elif k == ord('p'):                     args.rt_graphs = not args.rt_graphs # plots
     elif k == ord('d'):                     print_details = not print_details
 
-
     if args.last_frame > 0 and args.last_frame <= all_frame_counter:
         break
     success, frame = video_capture.read()
-
 
 if args.sm_filename != None and args.sm_reuse:
     #semantic_memory.save(args.sm_filename)
@@ -311,42 +309,3 @@ if args.em_filename != None:
 
 if args.surprises_filename != None:
     pickle.dump(all_surprises, open(args.surprises_filename,'wb'))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
